@@ -55,7 +55,7 @@ const signupBody = zod_1.default.object({
     name: zod_1.default.string(),
     email: zod_1.default.string().email(),
     password: zod_1.default.string().min(6),
-    imageUrl: zod_1.default.string()
+    imageUrl: zod_1.default.string().optional()
 });
 router.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const response = signupBody.safeParse(req.body);
@@ -87,6 +87,11 @@ router.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function*
         });
         res.status(201).json({
             message: "User created successfully",
+            data: {
+                name: user.name,
+                email: user.email,
+                imageUrl: user.imageUrl
+            }
         });
     }
     catch (error) {
@@ -133,7 +138,12 @@ router.post('/signin', (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(200).json({
             message: "User signed in successfully",
             // token: req.headers.cookie
-            token: req.cookies.token
+            // token: req.cookies.token
+            data: {
+                name: user.name,
+                email: user.email,
+                imageUrl: user.imageUrl
+            }
         });
     }
     catch (error) {
