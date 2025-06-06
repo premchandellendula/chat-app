@@ -16,6 +16,11 @@ app.use((0, cors_1.default)({
     origin: "http://localhost:5173"
 }));
 app.use('/api/v1', index_1.default);
+app.use((req, res, next) => {
+    const error = new Error(`Not Found - ${req.originalUrl}`);
+    res.status(404);
+    next(error);
+});
 app.listen(PORT, () => {
     console.log(`Server is running on localhost:${PORT}`);
 });
