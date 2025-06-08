@@ -55,7 +55,11 @@ const signupBody = zod_1.default.object({
     name: zod_1.default.string(),
     email: zod_1.default.string().email(),
     password: zod_1.default.string().min(6),
+    confirmPassword: zod_1.default.string().min(6),
     imageUrl: zod_1.default.string().optional()
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"]
 });
 router.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const response = signupBody.safeParse(req.body);
@@ -63,6 +67,7 @@ router.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(400).json({
             message: "Incorrect inputs"
         });
+        return;
     }
     const { name, email, password, imageUrl } = req.body;
     try {
