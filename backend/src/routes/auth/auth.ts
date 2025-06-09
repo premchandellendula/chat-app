@@ -4,6 +4,7 @@ import zod from 'zod'
 import * as argon2 from "argon2";
 import jwt from 'jsonwebtoken'
 import { User } from '../../db';
+import authMiddleware from '../../middlewares/authMiddleware';
 
 const signupBody = zod.object({
     name: zod.string(),
@@ -52,6 +53,8 @@ router.post('/signup', async (req, res): Promise<void> => {
         res.cookie("token", token, {
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 24 * 2, // 2 days
+            sameSite: "lax",
+            secure: false
         })
 
         res.status(201).json({
@@ -92,8 +95,9 @@ router.post('/signin', async (req, res) => {
             email: email
         })
 
-        if(!user){
-            throw new Error("Erro fetching user")
+        if(!user || !user.password){
+            throw new Error("User not found or password missing")
+            return;
         }
 
         const isPasswordValid = await argon2.verify(user.password, password)
@@ -114,6 +118,8 @@ router.post('/signin', async (req, res) => {
         res.cookie("token", token, {
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 24 * 2, // 2 days
+            sameSite: "lax",
+            secure: false
         })
 
         res.status(200).json({
@@ -128,10 +134,39 @@ router.post('/signin', async (req, res) => {
         })
     } catch (error) {
         res.status(500).json({
-            message: "Error creating user",
+            message: "Error logging user",
             error: error instanceof Error ? error.message : "Unknown error",
         })
     }
+})
+
+router.get('/me', authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findOne({
+            _id: req.userId
+        }).select("-password")
+
+        res.status(200).json({
+            message: "User fetched successfully",
+            user
+        })
+    } catch (err) {
+        console.log("Error fetching the user: ", err)
+        res.status(500).json({
+            message: "Error fetching user",
+        })
+    }
+})
+
+router.post('/logout', authMiddleware, (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: false // or true in production over HTTPS
+    })  // empty the cookie or just do res.clearCookie("token")
+    res.json({
+        message: "Logged out"
+    })
 })
 
 export default router

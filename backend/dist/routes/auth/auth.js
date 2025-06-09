@@ -51,6 +51,7 @@ const zod_1 = __importDefault(require("zod"));
 const argon2 = __importStar(require("argon2"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const db_1 = require("../../db");
+const authMiddleware_1 = __importDefault(require("../../middlewares/authMiddleware"));
 const signupBody = zod_1.default.object({
     name: zod_1.default.string(),
     email: zod_1.default.string().email(),
@@ -89,6 +90,8 @@ router.post('/signup', (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.cookie("token", token, {
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 24 * 2, // 2 days
+            sameSite: "lax",
+            secure: false
         });
         res.status(201).json({
             message: "User created successfully",
@@ -122,8 +125,9 @@ router.post('/signin', (req, res) => __awaiter(void 0, void 0, void 0, function*
         const user = yield db_1.User.findOne({
             email: email
         });
-        if (!user) {
-            throw new Error("Erro fetching user");
+        if (!user || !user.password) {
+            throw new Error("User not found or password missing");
+            return;
         }
         const isPasswordValid = yield argon2.verify(user.password, password);
         if (!isPasswordValid) {
@@ -139,6 +143,8 @@ router.post('/signin', (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.cookie("token", token, {
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 24 * 2, // 2 days
+            sameSite: "lax",
+            secure: false
         });
         res.status(200).json({
             message: "User signed in successfully",
@@ -153,9 +159,36 @@ router.post('/signin', (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
     catch (error) {
         res.status(500).json({
-            message: "Error creating user",
+            message: "Error logging user",
             error: error instanceof Error ? error.message : "Unknown error",
         });
     }
 }));
+router.get('/me', authMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield db_1.User.findOne({
+            _id: req.userId
+        }).select("-password");
+        res.status(200).json({
+            message: "User fetched successfully",
+            user
+        });
+    }
+    catch (err) {
+        console.log("Error fetching the user: ", err);
+        res.status(500).json({
+            message: "Error fetching user",
+        });
+    }
+}));
+router.post('/logout', authMiddleware_1.default, (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: false // or true in production over HTTPS
+    }); // empty the cookie or just do res.clearCookie("token")
+    res.json({
+        message: "Logged out"
+    });
+});
 exports.default = router;

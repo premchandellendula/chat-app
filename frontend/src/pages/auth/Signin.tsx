@@ -8,6 +8,7 @@ import axios from "axios"
 import { BACKEND_URL } from "../../config"
 import { toast } from "sonner"
 import { useNavigate } from "react-router-dom"
+import { useUser } from "../other/UserProvider"
 
 const Signin = () => {
     const [formData, setFormData] = useState({
@@ -18,6 +19,7 @@ const Signin = () => {
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
+    const { login } = useUser()
 
     const canSubmit = formData.email.trim() !== "" && formData.password.trim() !== "";
 
@@ -35,12 +37,15 @@ const Signin = () => {
         setLoading(true)
 
         try{
-            await axios.post(`${BACKEND_URL}/auth/signin`, formData)
+            await axios.post(`${BACKEND_URL}/auth/signin`, formData, {
+                withCredentials: true
+            })
+            await login()
 
-            toast.success("Signup successful")
+            toast.success("Signin successful")
 
             if(formData.email && formData.password){
-                navigate('/')
+                navigate('/chats')
             }
         }catch(err){
             let errorMessage = "Something went wrong";

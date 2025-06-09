@@ -16,6 +16,7 @@ async function authMiddleware(req: Request, res: Response, next: NextFunction){
         res.status(401).json({
             message: "Token is missing"
         })
+        return;
     }
 
     try{
@@ -28,12 +29,14 @@ async function authMiddleware(req: Request, res: Response, next: NextFunction){
             res.status(401).json({
                 message: "Invalid token payload"
             })
+            return;
         }
     }catch(err){
         res.status(401).json({
             message: "Unauthorized",
             error: err instanceof Error ? err.message : "Unknown error"
         })
+        return;
     }
 }
 
