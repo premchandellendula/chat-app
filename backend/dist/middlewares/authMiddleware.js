@@ -20,6 +20,7 @@ function authMiddleware(req, res, next) {
             res.status(401).json({
                 message: "Token is missing"
             });
+            return;
         }
         try {
             const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
@@ -31,6 +32,7 @@ function authMiddleware(req, res, next) {
                 res.status(401).json({
                     message: "Invalid token payload"
                 });
+                return;
             }
         }
         catch (err) {
@@ -38,6 +40,7 @@ function authMiddleware(req, res, next) {
                 message: "Unauthorized",
                 error: err instanceof Error ? err.message : "Unknown error"
             });
+            return;
         }
     });
 }

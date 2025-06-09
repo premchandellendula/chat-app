@@ -9,6 +9,7 @@ import { BACKEND_URL } from "../../config"
 import { toast } from "sonner"
 import { useNavigate } from "react-router-dom"
 import FileInput from "../../components/ui/FileInput"
+import { useUser } from "../other/UserProvider"
 
 const Signup = () => {
     const [formData, setFormData] = useState({
@@ -23,6 +24,7 @@ const Signup = () => {
     const [loading, setLoading] = useState(false);
     const [confirmPasswordError, setConfirmPasswordError] = useState("");
     const navigate = useNavigate();
+    const { login } = useUser()
 
     const canSubmit =
         formData.name.trim() !== "" &&
@@ -61,12 +63,16 @@ const Signup = () => {
         setLoading(true)
 
         try{
-            await axios.post(`${BACKEND_URL}/auth/signup`, formData)
+            await axios.post(`${BACKEND_URL}/auth/signup`, formData, {
+                withCredentials: true
+            })
+
+            await login()
 
             toast.success("Signup successful")
 
             if(formData.email && formData.password){
-                navigate('/')
+                navigate('/chats')
             }
         }catch(err){
             let errorMessage = "Something went wrong";
