@@ -9,7 +9,8 @@ import { BACKEND_URL } from "../../config"
 import { toast } from "sonner"
 import { useNavigate } from "react-router-dom"
 import FileInput from "../../components/ui/FileInput"
-import { useUser } from "../other/UserProvider"
+import { useUser } from "../../components/hooks/useUser"
+
 
 const Signup = () => {
     const [formData, setFormData] = useState({

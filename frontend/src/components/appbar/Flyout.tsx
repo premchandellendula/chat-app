@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { useUser } from "../../pages/other/UserProvider"
 import UserIcon from "../icons/UserIcon";
 import Logout from "../icons/Logout";
 import ProfileDialog from "../dialog/ProfileDialog";
+import { useUser } from "../hooks/useUser";
 
 interface IFlyout {
     setIsFlyoutOpen: (value: boolean) => void
 }
 
 const Flyout = (props: IFlyout) => {
-    const { logout } = useUser()
+    const { user, logout } = useUser()
     const ref = useRef<HTMLDivElement>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false)
 
@@ -42,7 +42,7 @@ const Flyout = (props: IFlyout) => {
                 <span className="text-lg">Logout</span>
             </div>
 
-            {isDialogOpen && <ProfileDialog isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen} />}
+            {isDialogOpen && <ProfileDialog user={user} isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen} />}
         </div>
     )
 }

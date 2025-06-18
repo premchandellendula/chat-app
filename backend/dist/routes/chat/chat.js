@@ -194,7 +194,7 @@ router.put('/addusertogroup', authMiddleware_1.default, (req, res) => __awaiter(
     }
 }));
 // remove someone from a group chat
-router.put('/removeusertogroup', authMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.put('/removeuserfromgroup', authMiddleware_1.default, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { chatId, user_id } = req.body;
     try {
         const groupChat = yield db_1.Chat.findById(chatId);

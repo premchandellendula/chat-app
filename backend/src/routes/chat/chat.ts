@@ -207,7 +207,7 @@ router.put('/addusertogroup', authMiddleware, async (req, res) => {
 })
 
 // remove someone from a group chat
-router.put('/removeusertogroup', authMiddleware, async (req, res) => {
+router.put('/removeuserfromgroup', authMiddleware, async (req, res) => {
     const { chatId, user_id } = req.body;
 
     

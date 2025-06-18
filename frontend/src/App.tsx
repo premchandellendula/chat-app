@@ -5,6 +5,7 @@ import Signin from "./pages/auth/Signin"
 import ThemeProvider from "./pages/other/ThemeProvider"
 import Chats from "./pages/chat/Chats"
 import UserProvider from "./pages/other/UserProvider"
+import ChatProvider from "./pages/other/ChatProvider"
 
 function App() {
 
@@ -12,14 +13,16 @@ function App() {
     <div>
       <BrowserRouter>
         <UserProvider>
-          <ThemeProvider>
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/signin" element={<Signin />} />
-              <Route path="/chats" element={<Chats />} />
-            </Routes>
-          </ThemeProvider>
+          <ChatProvider>
+            <ThemeProvider>
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/signin" element={<Signin />} />
+                <Route path="/chats" element={<Chats />} />
+              </Routes>
+            </ThemeProvider>
+          </ChatProvider>
         </UserProvider>
       </BrowserRouter>
     </div>    
