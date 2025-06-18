@@ -8,7 +8,7 @@ import axios from "axios"
 import { BACKEND_URL } from "../../config"
 import { toast } from "sonner"
 import { useNavigate } from "react-router-dom"
-import { useUser } from "../other/UserProvider"
+import { useUser } from "../../components/hooks/useUser"
 
 const Signin = () => {
     const [formData, setFormData] = useState({

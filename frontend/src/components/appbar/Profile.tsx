@@ -1,6 +1,6 @@
 import { useState } from "react"
-import { useUser } from "../../pages/other/UserProvider"
 import Flyout from "./Flyout"
+import { useUser } from "../hooks/useUser"
 
 const Profile = () => {
     const { user } = useUser()

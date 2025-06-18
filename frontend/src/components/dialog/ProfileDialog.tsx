@@ -1,13 +1,13 @@
-import { useUser } from "../../pages/other/UserProvider"
+import type { UserType } from "../../config"
 import Cross from "../icons/Cross"
 
 interface IProfileDialog {
     setIsDialogOpen: (val: boolean) => void
     isDialogOpen: boolean
+    user: UserType | null
 }
 
-const ProfileDialog = ({isDialogOpen, setIsDialogOpen} : IProfileDialog) => {
-    const { user } = useUser()
+const ProfileDialog = ({user, isDialogOpen, setIsDialogOpen} : IProfileDialog) => {
     return (
         <div className="fixed inset-0 min-h-screen w-full flex justify-center items-center z-50 bg-black/80">
             <div className="bg-white w-72 flex flex-col rounded-md p-6">
