@@ -34,3 +34,34 @@ export const handleSearch = async (query: string, search: string, setSearch: (va
         toast.error(errorMessage)
     }
 }
+
+export const isSameSender = (messages: any, m: any, i: any, userId: any) => {
+    return (
+        i < messages.length - 1 && (
+            messages[i + 1].userId._id !== m.userId._id || messages[i + 1].userId._id === undefined) && messages[i].userId._id !== userId
+    )
+}
+
+export const isLastMessage = (messages: any, i: any, userId: any) => {
+    return (
+        i === messages.length - 1 && messages[messages.length - 1].userId._id !== userId && messages[messages.length - 1].userId._id
+    )
+}
+
+export const isSameSenderMargin = (messages: any, m: any, i: any, userId: any) => {
+    if(
+        i < messages.length - 1 && messages[i + 1].userId._id === m.userId._id && messages[i].userId._id !== userId
+    ){
+        return 33
+    }else if(
+        (i < messages.length - 1 && messages[i + 1].userId._id !== m.userId._id && messages[i].userId._id !== userId) || (i === messages.length - 1 && messages[i].userId._id !== userId)
+    ){
+        return 0
+    }else{
+        return "auto"
+    }
+}
+
+export const isSameUser = (messages: any, m: any, i: any) => {
+    return i > 0 && messages[i-1].userId._id === m.userId._id
+}

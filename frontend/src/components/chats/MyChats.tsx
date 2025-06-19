@@ -7,7 +7,7 @@ import { BACKEND_URL } from "../../config"
 import { useChat } from "../../pages/other/ChatProvider"
 import { toast } from "sonner"
 import GroupChatModal from "../dialog/GroupChatModal"
-import { getSender } from "../config/chatLogics"
+import { getSender, getSenderFullDetails } from "../config/chatLogics"
 import { useUser } from "../hooks/useUser"
 
 const MyChats = ({fetchAgain}: {fetchAgain: boolean}) => {
@@ -78,16 +78,16 @@ const MyChats = ({fetchAgain}: {fetchAgain: boolean}) => {
             {chats.length === 0 ? (
                 <p className="text-gray-500">No chats found.</p>
             ) : (
-                <ul className="flex flex-col gap-3 mt-2">
+                <ul className="flex flex-col gap-1.5 mt-2">
                     {chats.map((chat: any) => (
                         <li
                         key={chat._id}
                         onClick={() => setSelectedChat(chat)}
-                        className={`cursor-pointer p-1 rounded-md mx-2 hover:bg-gray-300/60 dark:hover:bg-gray-800 dark:text-white ${selectedChat === chat ? "bg-green-500" : "bg-gray-200/80"}`}>
+                        className={`cursor-pointer p-1 rounded-md mx-2 dark:text-white ${selectedChat === chat ? "bg-gray-400/80 dark:bg-gray-700" : "bg-gray-200/80 dark:bg-gray-900 hover:bg-gray-300/60 dark:hover:bg-gray-900/70"}`}>
                             <div className="flex items-center gap-3">
                                 {!chat.isGroupChat ? (
                                     <>
-                                        <img src={chat.users[0].imageUrl} alt={chat.users[0].name} className="w-10 h-10 rounded-full object-cover" />
+                                        <img src={getSenderFullDetails(user, chat.users).imageUrl} alt={getSenderFullDetails(user, chat.users).name} className="w-10 h-10 rounded-full object-cover" />
                                         <span>{getSender(user, chat.users)}</span>
                                     </>
                                 ) : (
