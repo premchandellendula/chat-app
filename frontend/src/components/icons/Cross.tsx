@@ -6,7 +6,7 @@ interface ICross {
 
 const Cross = ({onClick}: ICross) => {
     return (
-        <div onClick={onClick} className="text-lg">
+        <div onClick={onClick} className="text-lg dark:text-gray-300">
             <RxCross2 />
         </div>
     )
