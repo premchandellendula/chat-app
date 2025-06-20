@@ -1,3 +1,4 @@
+import Notifications from "./Notifications"
 import Profile from "./Profile"
 import ThemeButton from "./ThemeButton"
 
@@ -8,6 +9,7 @@ const Appbar = () => {
                 ChatApp
             </div>
             <div className="flex gap-2">
+                <Notifications />
                 <ThemeButton />
                 <Profile />
             </div>

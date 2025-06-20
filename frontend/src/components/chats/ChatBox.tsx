@@ -23,7 +23,7 @@ interface IChatsProps {
 const ChatBox = ({fetchAgain, setFetchAgain}: IChatsProps) => {
     const [messages, setMessages] = useState<any>([])
     const [newMessage, setNewMessage] = useState("")
-    const { selectedChat } = useChat()
+    const { selectedChat, notification, setNotification } = useChat()
     const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false)
     const [isGroupChatModalOpen, setIsGroupChatModalOpen] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -53,8 +53,11 @@ const ChatBox = ({fetchAgain, setFetchAgain}: IChatsProps) => {
             if (!selectedChatRef.current || 
                 selectedChatRef.current._id !== newMessageReceived.chatId._id) {
                 console.log("Message not for current chat, showing notification")
-                // TODO: Show notification
-                return
+                
+                if(!notification.includes(newMessageReceived)){
+                    setNotification([newMessageReceived, ...notification])
+                    setFetchAgain(!fetchAgain)
+                }
             }
 
             // Add message to current chat
@@ -74,6 +77,8 @@ const ChatBox = ({fetchAgain, setFetchAgain}: IChatsProps) => {
             }
         };
     }, [user])
+
+    // console.log(notification, "--------------")
 
     useEffect(() => {
         if(!selectedChat){
