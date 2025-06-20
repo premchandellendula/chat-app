@@ -7,8 +7,15 @@ const app = express()
 const PORT = process.env.PORT
 app.use(express.json())
 app.use(cookieParser());
+const allowedOrigins = ['http://localhost:5173', 'https://chat-app-pc.vercel.app'];
 app.use(cors({
-    origin: ["http://localhost:5173", "https://chat-app-pc.vercel.app"],
+    origin: function(origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true
 }));
 
@@ -32,7 +39,7 @@ import { Server } from 'socket.io'
 const io = new Server(server, {
     pingTimeout: 60000,
     cors: {
-        origin: "http://localhost:5173"
+        origin: allowedOrigins
     }
 })
 
