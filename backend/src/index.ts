@@ -14,6 +14,10 @@ app.use(cors({
 
 app.use('/api/v1', rootRouter)
 
+app.get('/', (req, res) => {
+    res.send("API is working 🚀");
+});
+
 app.use((req, res, next) => {
     const error = new Error(`Not Found - ${req.originalUrl}`);
     res.status(404);
