@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent } from "react"
+import { useEffect, useRef, useState, type ChangeEvent } from "react"
 import { useChat } from "../../pages/other/ChatProvider"
 import { getSender, getSenderFullDetails } from "../config/chatLogics"
 import ProfileDialog from "../dialog/ProfileDialog"
@@ -8,14 +8,17 @@ import UpdateGroupChatModal from "../dialog/UpdateGroupChatModal"
 import Send from "../icons/Send"
 import { toast } from "sonner"
 import axios from "axios"
-import { BACKEND_URL } from "../../config"
+import { BACKEND_ENDPOINT, BACKEND_URL } from "../../config"
 import Spinner from "../loaders/Spinner"
 import ChatMessages from "./ChatMessages"
+import { io, Socket } from "socket.io-client"
 
 interface IChatsProps {
     fetchAgain: boolean,
     setFetchAgain: (e: boolean) => void
 }
+
+// let socket: Socket, selectedChatCompare: any;
 
 const ChatBox = ({fetchAgain, setFetchAgain}: IChatsProps) => {
     const [messages, setMessages] = useState<any>([])
@@ -24,11 +27,62 @@ const ChatBox = ({fetchAgain, setFetchAgain}: IChatsProps) => {
     const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false)
     const [isGroupChatModalOpen, setIsGroupChatModalOpen] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [socketConnected, setSocketConnected] = useState(false)
 
+    const socketRef = useRef<Socket | null>(null)
+    const selectedChatRef = useRef<any>(null)
     const { user } = useUser()
 
+    useEffect(() => {
+        if (!user || socketRef.current?.connected) return;
+
+        // console.log("Initializing socket connection...")
+        socketRef.current = io(BACKEND_ENDPOINT)
+        socketRef.current.emit("setup", user)
+        socketRef.current.on("connected", () => setSocketConnected(true))
+
+        socketRef.current.on("message received", (newMessageReceived) => {
+            console.log("Message received:", newMessageReceived)
+            
+            // Check if the message belongs to the currently selected chat
+            if (!selectedChatRef.current || 
+                selectedChatRef.current._id !== newMessageReceived.chatId._id) {
+                console.log("Message not for current chat, showing notification")
+                // TODO: Show notification
+                return
+            }
+
+            // Add message to current chat
+            setMessages((prevMessages: any) => [...prevMessages, newMessageReceived])
+        })
+
+        socketRef.current.on("disconnect", () => {
+            console.log("Socket disconnected")
+            setSocketConnected(false)
+        })
+
+        return () => {
+            if (socketRef.current) {
+                socketRef.current.disconnect();
+                socketRef.current = null
+                setSocketConnected(false)
+            }
+        };
+    }, [user])
+
+    useEffect(() => {
+        if(!selectedChat){
+            selectedChatRef.current = null
+            return
+        }
+
+        console.log("Selected chat changes: ", selectedChat._id)
+        selectedChatRef.current = selectedChat
+        fetchMessages()
+    }, [selectedChat])
+
     const fetchMessages = async () => {
-        if(!selectedChat) return;
+        if(!selectedChat || !socketRef.current) return;
         setLoading(true)
 
         try {
@@ -37,6 +91,8 @@ const ChatBox = ({fetchAgain, setFetchAgain}: IChatsProps) => {
             })
             // console.log(response.data.messages)
             setMessages(response.data.messages)
+
+            socketRef.current.emit("join chat", selectedChat._id)
         } catch (err) {
             const errorMessage = axios.isAxiosError(err)
             ? err.response?.data?.message || err.message
@@ -50,27 +106,32 @@ const ChatBox = ({fetchAgain, setFetchAgain}: IChatsProps) => {
         }
     }
 
-    useEffect(() => {
-        fetchMessages()
-    }, [selectedChat])
-
     const handleSendMessage = async (e?: React.KeyboardEvent | React.MouseEvent) => {
         e?.preventDefault()
 
         if(!newMessage.trim()){
             toast.warning("Please enter a message")
+            return
         }
-        // console.log(e)
+
+        if(!selectedChat || !socketRef.current){
+            toast.error("Chat not selected or connection lost")
+            return;
+        }
+
+        const messageToSend = newMessage.trim()
+        setNewMessage("")
 
         try {
-            setNewMessage("")
+            // setNewMessage("")
             const response = await axios.post(`${BACKEND_URL}/message`, {
                 chatId: selectedChat?._id,
-                message: newMessage
+                message: messageToSend
             }, {
                 withCredentials: true
             })
             // console.log(response.data.newMessage)
+            socketRef.current.emit("new message", response.data.newMessage)
             setMessages((prevMessages: any) => [...prevMessages, response.data.newMessage])
         } catch (err) {
             const errorMessage = axios.isAxiosError(err)
@@ -79,6 +140,8 @@ const ChatBox = ({fetchAgain, setFetchAgain}: IChatsProps) => {
             
             console.log("Error sending message: ", err)
             toast.error(errorMessage)
+
+            setNewMessage(messageToSend)
         }
     }
 
@@ -87,6 +150,7 @@ const ChatBox = ({fetchAgain, setFetchAgain}: IChatsProps) => {
 
         // Typing Indicator logic
     }
+
     return (
         <div className="w-[65%] dark:bg-[#0a0b1b] flex flex-col border-l border-gray-300 dark:border-gray-800 h-full">
             {selectedChat ? (

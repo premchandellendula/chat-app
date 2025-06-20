@@ -26,7 +26,7 @@ const UserProvider = ({children}: UserProviderProps) => {
                 withCredentials: true
             });
 
-            console.log(res)
+            // console.log(res)
             setUser(res.data.user)
         } catch (err) {
             console.error("Failed to fetch user", err)

@@ -12,7 +12,7 @@ const ChatMessages = ({messages}: IChatMessages) => {
 
     useEffect(() => {
         messageEndRef.current?.scrollIntoView({behavior: "auto"})
-    }, [])
+    }, [messages])
     return (
         <div className="mb-2 flex flex-col overflow-y-auto px-1 py-2">
             {messages.map((message: any, i: any) => (
