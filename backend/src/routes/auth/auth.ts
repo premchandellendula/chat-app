@@ -53,8 +53,8 @@ router.post('/signup', async (req, res): Promise<void> => {
         res.cookie("token", token, {
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 24 * 2, // 2 days
-            sameSite: "lax",
-            secure: false
+            sameSite: "none",
+            secure: true
         })
 
         res.status(201).json({
@@ -118,8 +118,8 @@ router.post('/signin', async (req, res) => {
         res.cookie("token", token, {
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 24 * 2, // 2 days
-            sameSite: "lax",
-            secure: false
+            sameSite: "none",
+            secure: true
         })
 
         res.status(200).json({
