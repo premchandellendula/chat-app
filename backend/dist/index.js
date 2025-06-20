@@ -16,6 +16,9 @@ app.use((0, cors_1.default)({
     credentials: true
 }));
 app.use('/api/v1', index_1.default);
+app.get('/', (req, res) => {
+    res.send("API is working 🚀");
+});
 app.use((req, res, next) => {
     const error = new Error(`Not Found - ${req.originalUrl}`);
     res.status(404);
