@@ -10,12 +10,10 @@ interface SearchBarProps {
 
 const SearchBar = ({ onResults, openModal }: SearchBarProps) => {
     const [name, setName] = useState("")
-    const [loading, setLoading] = useState(false)
 
     const handleSearch = async (e: any) => {
         e.preventDefault()
 
-        setLoading(true)
         if(!name){
             toast.warning("Please enter a name!")
         }
@@ -35,9 +33,6 @@ const SearchBar = ({ onResults, openModal }: SearchBarProps) => {
             }
             console.log("Error signing up: ", err)
             toast.error(errorMessage)
-            setLoading(false)
-        }finally{
-            setLoading(false)
         }
     }
 
