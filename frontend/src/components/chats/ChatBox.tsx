@@ -28,6 +28,8 @@ const ChatBox = ({fetchAgain, setFetchAgain}: IChatsProps) => {
     const [isGroupChatModalOpen, setIsGroupChatModalOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const [socketConnected, setSocketConnected] = useState(false)
+    const [typing, setTyping] = useState(false)
+    const [isTyping, setIsTyping] = useState(false)
 
     const socketRef = useRef<Socket | null>(null)
     const selectedChatRef = useRef<any>(null)
@@ -40,6 +42,9 @@ const ChatBox = ({fetchAgain, setFetchAgain}: IChatsProps) => {
         socketRef.current = io(BACKEND_ENDPOINT)
         socketRef.current.emit("setup", user)
         socketRef.current.on("connected", () => setSocketConnected(true))
+
+        socketRef.current.on("typing", () => setIsTyping(true))
+        socketRef.current.on("stop typing", () => setIsTyping(false))
 
         socketRef.current.on("message received", (newMessageReceived) => {
             console.log("Message received:", newMessageReceived)
@@ -133,6 +138,8 @@ const ChatBox = ({fetchAgain, setFetchAgain}: IChatsProps) => {
             // console.log(response.data.newMessage)
             socketRef.current.emit("new message", response.data.newMessage)
             setMessages((prevMessages: any) => [...prevMessages, response.data.newMessage])
+
+            socketRef.current.emit("stop typing", selectedChat._id)
         } catch (err) {
             const errorMessage = axios.isAxiosError(err)
             ? err.response?.data?.message || err.message
@@ -149,6 +156,26 @@ const ChatBox = ({fetchAgain, setFetchAgain}: IChatsProps) => {
         setNewMessage(e.target.value)
 
         // Typing Indicator logic
+        if(!socketConnected) return
+
+        if(!typing){
+            setTyping(true)
+            socketRef.current?.emit("typing", selectedChat?._id)
+        }
+
+        let lastTypingTime= new Date().getTime()
+        let timerLength = 3000;
+
+        setTimeout(() => {
+            let timeNow = new Date().getTime()
+
+            let timeDiff = timeNow - lastTypingTime
+
+            if(timeDiff >= timerLength || typing){
+                socketRef.current?.emit("stop typing", selectedChat?._id)
+                setTyping(false)
+            }
+        }, timerLength)
     }
 
     return (
@@ -187,9 +214,10 @@ const ChatBox = ({fetchAgain, setFetchAgain}: IChatsProps) => {
                                 <Spinner />
                             </div>
                         ) : (
-                            <ChatMessages messages={messages} />
+                            <ChatMessages messages={messages} isTyping={isTyping} />
                         )}
                     </div>
+                    
                     <div className="relative border-t border-gray-300 dark:border-gray-800 px-2 py-1.5">
                         <input 
                         type="text" 
