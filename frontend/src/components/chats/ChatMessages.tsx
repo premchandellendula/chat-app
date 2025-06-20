@@ -1,18 +1,30 @@
 import { useEffect, useRef } from "react"
 import { isSameUser } from "../config/chatLogics"
 import { useUser } from "../hooks/useUser"
+import Lottie from 'react-lottie'
+import animationData from '../animations/typing.json'
 
 interface IChatMessages {
-    messages: any[]
+    messages: any[],
+    isTyping?: boolean
 }
 
-const ChatMessages = ({messages}: IChatMessages) => {
+const ChatMessages = ({messages, isTyping=false}: IChatMessages) => {
     const messageEndRef = useRef<HTMLDivElement>(null)
     const { user } = useUser()
 
+    const defaultOptions = {
+        loop: true,
+        autoplay: true,
+        animationData: animationData,
+        renderSettings: {
+            preserveAspectRatio: "xMidYMid slice"
+        }
+    }
+
     useEffect(() => {
         messageEndRef.current?.scrollIntoView({behavior: "auto"})
-    }, [messages])
+    }, [messages, isTyping])
     return (
         <div className="mb-2 flex flex-col overflow-y-auto px-1 py-2">
             {messages.map((message: any, i: any) => (
@@ -28,6 +40,31 @@ const ChatMessages = ({messages}: IChatMessages) => {
                     </div>
                 </div>
             ))}
+
+{isTyping ? (
+    <div style={{
+        width: '50px',
+        height: '50px',
+        margin: 0,
+        padding: 0,
+        marginLeft: 5,
+        position: 'relative'
+    }}>
+        <Lottie
+            width={80}
+            height={80}
+            options={defaultOptions}
+            style={{
+                margin: 0,
+                padding: 0,
+                position: 'absolute',
+                left: '-20px'
+            }}
+        />
+    </div>
+) : (
+    <></>
+)}
 
             <div ref={messageEndRef} ></div>
         </div>
