@@ -65,7 +65,7 @@ const MyChats = ({fetchAgain}: {fetchAgain: boolean}) => {
 
     return (
         <div className="w-[35%] relative">
-            <div className="flex justify-between py-2 px-4">
+            <div className="flex justify-between py-2.5 px-4">
                 <p className="font-semibold text-[1.1rem] dark:text-white">Chats</p>
                 <Plus onClick={() => setIsGroupChatModalOpen(true)} />
             </div>

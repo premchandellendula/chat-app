@@ -49,6 +49,7 @@ router.post('/', authMiddleware_1.default, (req, res) => __awaiter(void 0, void 
         yield db_1.Chat.findByIdAndUpdate(chatId, {
             latestMessage: newMessage
         });
+        // console.log(newMessage)
         res.status(201).json({
             message: "Message sent successfully",
             newMessage

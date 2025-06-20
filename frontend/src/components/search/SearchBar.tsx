@@ -42,8 +42,8 @@ const SearchBar = ({ onResults, openModal }: SearchBarProps) => {
     }
 
     return (
-        <div className="flex items-center rounded-md relative w-full bg-gray-200/60 text-gray-800 shadow-inner dark:bg-gray-950 dark:text-gray-200 dark:shadow-md">
-            <input onChange={(e) => setName(e.target.value)} type="text" className="rounded-md px-4 md:py-2 py-1 w-full bg-transparent focus:outline-none placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-green-200/70 dark:focus:ring-gray-800" placeholder="Search Users" />
+        <div className="flex items-center rounded-md relative w-full bg-gray-200/60 text-gray-800 shadow-inner dark:bg-gray-950 dark:text-gray-200 dark:shadow-md mt-1.5">
+            <input onChange={(e) => setName(e.target.value)} type="text" className="rounded-md px-4 md:py-2 py-2 w-full bg-transparent focus:outline-none placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-green-200/70 dark:focus:ring-gray-800" placeholder="Search Users" />
             <span 
             onClick={handleSearch}
             className="absolute right-0">

@@ -36,7 +36,13 @@ io.on("connection", (socket) => {
     console.log("Connected to socket.io")
 
     socket.on("setup", (userData) => {
+        if (!userData || !userData._id) {
+            console.log("Invalid userData:", userData);
+            return;
+        }
+
         socket.join(userData._id);
+        // console.log(userData._id)
         socket.emit("connected")
     })
 
@@ -54,15 +60,18 @@ io.on("connection", (socket) => {
     })
 
     socket.on("new message", (newMessage) => {
-        let chat = newMessage.chat;
-
+        const chat = newMessage.chatId;
+        // console.log(newMessage)
+        // console.log(chat.users)
         if(!chat.users){
-            return console.log("chat.users is not defined");
+            console.log("chat.users is not defined");
+            return;
         }
 
         chat.users.forEach((user: any) => {
-            if(user._id === newMessage.userId) return;
-
+            if(user._id === newMessage.userId._id) return;
+            // console.log(user._id)
+            // console.log(newMessage.message)
             socket.in(user._id).emit("message received", newMessage)
         })
     })

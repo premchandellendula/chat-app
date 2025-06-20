@@ -44,6 +44,7 @@ router.post('/', authMiddleware, async (req, res) => {
             latestMessage: newMessage
         })
 
+        // console.log(newMessage)
         res.status(201).json({
             message: "Message sent successfully",
             newMessage
