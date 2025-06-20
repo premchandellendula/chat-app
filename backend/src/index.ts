@@ -8,7 +8,7 @@ const PORT = process.env.PORT
 app.use(express.json())
 app.use(cookieParser());
 app.use(cors({
-    origin: ["http://localhost:5173", "https://chat-app-pc.vercel.app/"],
+    origin: ["http://localhost:5173", "https://chat-app-pc.vercel.app"],
     credentials: true
 }));
 
